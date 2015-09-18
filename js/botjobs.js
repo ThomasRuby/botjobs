@@ -1,6 +1,5 @@
 "use strict";
 
-
 var Job = React.createClass({
   render: function() {
     return (
@@ -13,7 +12,6 @@ var Job = React.createClass({
     )
   }
 });
-
 
 var JobsList = React.createClass({
   render: function() {
@@ -64,19 +62,32 @@ var InputFile =  React.createClass({
 var JobInput = React.createClass({
   submit: function(e){
     e.preventDefault();
-    /* Un peu de jquery, passer à flux ? */
+    // Un peu de jquery, passer à flux ?
     var submission = {file: $('#formfile').val(), comment: $('#formcomment').val()};
+    alert(submission.file);
     $.ajax({
       type: "POST",
       url: 'post_job.php',
       data: submission,
       dataType: 'json',
       success: function(data){
-        if (data.ok != 'ok'){alert(data)}
-      }
+        alert(data);
+        if (data.id == 'undefined'){
+          alert(data);
+        }
+        else {
+          this.clearForm();
+        }
+      }.bind(this)
     });
   },
+  clearForm: function(){
+    alert('clear');
+    $('#formfile').val('');
+    $('#formcomment').val('');
+  },
   render: function(){
+//        <form action="post_job.php" id="jobInput">
     return (
         <div className="jobInput">
         <form onSubmit={this.submit} id="jobInput">
@@ -92,6 +103,54 @@ var JobInput = React.createClass({
     )
   }
 });
+
+
+
+/* test */
+/* source: */
+   /* http://stackoverflow.com/questions/21234106/upload-file-using-reactjs-via-blueimp-fileupload-jquery-plugin
+*/
+var FileUpload = React.createClass({
+  handleFile: function(e) {
+    var file = e.target.files[0];
+    var formData = new FormData();
+    console.log('formData');
+    formData.append('file',  file, file.name);
+    formData.append('comment', this.state.value);
+    this.setState(this.getInitialState());
+    $.ajax({
+      url: 'post_job.php',
+      data: formData,
+      cache: false,
+      processData: false,
+      contentType: false,
+      type: 'POST',
+      success: function(data) {
+        console.log('success', data);
+      },
+      error: function() {
+        console.error('error uploading file');
+      },
+    });
+  },
+  getInitialState: function() {
+    return {value: ''};
+  },
+  handleChange: function(event) {
+    this.setState({value: event.target.value});
+  },
+  render: function() {
+    var value = this.state.value;
+    return (
+        <div>
+        <input type="text" id='formcomment' name="comment" value={value} onChange={this.handleChange} />
+        <input className="btn btn-default btn-file" type="file" onChange={this.handleFile} accept="*.py"/>
+        </div>
+    );
+  }
+});
+/* fin test */
+
 
 var JobsBox = React.createClass({
   loadJobs: function(){
@@ -110,7 +169,7 @@ var JobsBox = React.createClass({
   render: function() {
     return (
         <div className="jobbox">
-        <JobInput />
+        <FileUpload />
         <JobsList jobs={this.state.jobs} />
         </div>
     )

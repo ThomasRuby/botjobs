@@ -40,10 +40,13 @@ function post_job_php($login) {
 
     /* get file content */
     $filename  = $_FILES['file']['tmp_name'];
-    $fp = fopen($filename, 'r');
-    $content = fread($fp, filesize($filename));
-    $content = addslashes($content);
-    fclose($fp);
+    $content = '';
+    print_r($_FILES);
+    if ($fp = fopen($filename, 'r')) {
+        $content = fread($fp, filesize($filename));
+        $content = addslashes($content);
+        fclose($fp);
+    }
     $set["file_content"] = $content;
 
     /* formation de la requete */
